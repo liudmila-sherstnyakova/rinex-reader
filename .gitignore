@@ -133,3 +133,4 @@ dmypy.json
 
 # Rinex-reader local ignored files
 data/
+.DS_Store

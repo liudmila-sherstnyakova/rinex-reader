@@ -1,26 +1,3 @@
-
-
-def get_correct_gnss(name: str):
-    if name == 'G':
-        return GPS()
-    elif name == 'R':
-        return GLO()
-    elif name == 'E':
-        return GAL()
-    elif name == 'J':
-        return QZS()
-    elif name == 'C':
-        return BDT()
-    elif name == 'I':
-        return IRN()
-    elif name == 'S':
-        return SBAS()
-    elif name == 'M':
-        return Mixed()
-    else:
-        raise ValueError("Unknown GNSS system: " + name)
-
-
 class GNSS:
     # Parent class for all GNSS systems
 
@@ -102,3 +79,24 @@ class Mixed(GNSS):
     name = "Mixed"
 
     obs_types = []
+
+
+def get_correct_gnss(name: str) -> GNSS:
+    if name == 'G':
+        return GPS()
+    elif name == 'R':
+        return GLO()
+    elif name == 'E':
+        return GAL()
+    elif name == 'J':
+        return QZS()
+    elif name == 'C':
+        return BDT()
+    elif name == 'I':
+        return IRN()
+    elif name == 'S':
+        return SBAS()
+    elif name == 'M':
+        return Mixed()
+    else:
+        raise ValueError("Unknown GNSS system: " + name)
