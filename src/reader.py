@@ -100,6 +100,31 @@ def read_rinex_file(
     >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file',
     ... start_epoch="2022-09-29T11:00:00", end_epoch="2022-09-29T11:00:40")
 
+    Parsing the result object
+    -------------------------
+
+    To obtain single observation value/lli/ssi
+
+    >>> result.data.satellites["C11"]["2022-09-29T11:00:30"]["L2I"]["value"]
+    >>> result.data.satellites["C11"]["2022-09-29T11:00:30"]["L2I"]["lli"]
+    >>> result.data.satellites["C11"]["2022-09-29T11:00:30"]["L2I"]["ssi"]
+
+    To obtain observation for the single obs type (value, lli, ssi)
+
+    >>> result.data.satellites["R04"]["2022-09-29T11:00:30"]["C1C"]
+    R04 - C1C:  (20279832.26, -1, -1)
+
+    To obtain all channels for the given satellite
+
+    >>> result.data.satellites["R04"]["2022-09-29T11:00:30"]
+    ((20279832.26, -1, -1), (1.08597601e+08, -1, 8), (2741.776, -1, -1), (20279835.24, -1, -1),
+    ... (84464829.352, -1, 8), (2132.492, -1, -1))
+
+    To obtain only values for all channels for the given satellite
+
+    >>> list(map(lambda x: x["value"], result.data.satellites["R04"]["2022-09-29T11:00:00"])))
+    [20279832.26, 108597600.752, 2741.776, 20279835.24, 84464829.352, 2132.492]
+
     :param rinex_file_path: str.
         Required. Path to the RINEX file
     :param start_epoch: str

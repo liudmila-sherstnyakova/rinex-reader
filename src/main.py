@@ -50,6 +50,7 @@ def read_with_single_time_filter():
     )
     print(result)
     print("R04 - C1C: ", result.data.satellites["R04"]["2022-09-29T11:00:00"]["C1C"])
+    print("R04 - C1C: ", list(map(lambda x: x["value"], result.data.satellites["R04"]["2022-09-29T11:00:00"])))
     print("E05 - C1X: ", result.data.satellites["E05"]["2022-09-29T11:00:00"]["C1X"])
 
 
