@@ -13,4 +13,8 @@ class RinexData:
         self.data = data
 
     def __str__(self):
-        return str(self.header)
+        return "Type: {t:s} (ver. {v:.2f}). Contains {s_no:d} satellites".format(
+            t=self.header.file_type,
+            v=self.header.version,
+            s_no=len(self.data.satellites)
+        )

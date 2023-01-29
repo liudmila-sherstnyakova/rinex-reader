@@ -1,6 +1,6 @@
 from datetime import datetime
 from itertools import groupby
-from typing import Dict, IO, List, Optional
+from typing import Dict, IO, List, Optional, Union
 import numpy as np
 import io
 import re
@@ -8,14 +8,7 @@ import re
 import common
 from observation.v3.header import ObservationHeaderV3
 
-
-class SingleObservationV3:
-    format = np.dtype([('value', np.float64), ('ssi', np.int32), ('lli', np.int32)])
-
-    def __init__(self, value: Optional[float], ssi: Optional[int], lli: Optional[int]):
-        self.value = value
-        self.lli = lli
-        self.ssi = ssi
+__single_observation_v3_format = np.dtype([('value', np.float64), ('ssi', np.int32), ('lli', np.int32)])
 
 
 class ObservationV3:
@@ -27,7 +20,7 @@ class ObservationV3:
         #           t5: (c1c,l1c,...)
         #      }
         # }
-        self.satellites: Dict[str, Dict[str, object]] = {}
+        self.satellites: Dict[str, Dict[str, np.void]] = {}
 
     def __str__(self):
         return str(self.satellites)
@@ -39,9 +32,23 @@ def __read_epoch_line(
         end_epoch: Optional[datetime]
 ) -> (str, bool, int):
     """
-    Reads epoch line for the given block
-    :param line:
-    :return:
+    Methods that reads start line for each observation record block.
+    Epoch time filter is applied to decide if current block should be read.
+
+    :param line: str.
+        Required. Epoch start line.
+    :param start_epoch: datetime.
+        Optional. Epoch time filter. Specifies start of the period that should be included in the result.
+        If used together with end_epoch, all blocks within the given timeframe will be read.
+        If used alone, the result will contain at most one block - the one that matches provided timestamp exactly.
+    :param end_epoch: datetime.
+        Optional. Epoch time filter. Specifies start of the period that should be included in the result.
+        When used, must be a date after the start_epoch date.
+    :return: Tuple(str, bool, int).
+        Returns three params:
+        * block name as ISO8601 formatted timestamp
+        * True/False if current block is valid or should be skipped due to filter
+        * block size - amount of lines with observations in current block
     """
     year = common.str2int(line[2:6], "Invalid year value in epoch line")
     month = common.str2int(line[7:9], "Invalid month value in epoch line")
@@ -66,14 +73,39 @@ def __read_epoch_line(
 
 
 def __read_single_observation_block(
-        lines: [str],
+        lines: List[str],
         block_name: str,
         observations: ObservationV3,
         header: ObservationHeaderV3,
         gnss: Optional[List[str]],
-        obs_types: Optional[str],
+        obs_types: Union[str, List[str], None],
         verbose: bool = False
-):
+) -> None:
+    """
+    Reads all lines that constitute a complete observation record block.
+
+    :param lines: List[str].
+        Required. List of lines that make up the block.
+        Method will run a groupby operation on the list, so the list must be sorted alphabetically.
+    :param block_name: str.
+        Required. Name of the current block. Typically a timestamp string in ISO8601 format.
+    :param observations: ObservationV3.
+        Required. Object that will be updated with observations from the given block.
+    :param header: ObservationHeaderV3.
+        Required. Header object with data read from the RINEX header
+    :param gnss: List[str].
+        Optional. GNSS filter. Specifies GNSS types (e.g. 'G' or 'E') that will be included into the result.
+        All other GNSS will be ignored.
+    :param obs_types: str or List[str].
+        Optional. Observation types filter.
+        If a single string is provided, it is treated as regex and used to filter obs types for all satellites.
+        If a list of strings is provided, then only that list is used to filter obs types.
+        If a GNSS does not have any obs types from that list, then that GNSS is not included in the result.
+    :param verbose: bool.
+        Optional. Flag to control debug output from the script.
+        Set to True if debug output should be printed to console.
+    :return: Nothing
+    """
     for system, obs_lines in groupby(lines, lambda x: x[0]):
 
         if gnss is not None and system not in gnss:
@@ -84,10 +116,12 @@ def __read_single_observation_block(
 
         lines_in_group = list(obs_lines)
         sv_names = [name[:3] for name in lines_in_group]
-        # self.all_satellites.update(n for n in sv_names)
         if obs_types is not None:
-            rule = re.compile(obs_types)
-            list_of_obs_types = list(filter(rule.match, header.obs_types[system]))
+            if isinstance(obs_types, str):
+                rule = re.compile(obs_types)
+                list_of_obs_types = list(filter(rule.match, header.obs_types[system]))
+            else:
+                list_of_obs_types = list(set(obs_types) & set(header.obs_types[system]))
         else:
             list_of_obs_types = header.obs_types[system]
         if len(list_of_obs_types) == 0:
@@ -98,20 +132,17 @@ def __read_single_observation_block(
         complete_group = "".join(lines_in_group)
         result = np.genfromtxt(io.BytesIO(complete_group.encode("ascii")),
                                delimiter=(3,) + (14, 1, 1) * amount_of_obs_types,
-                               dtype=[('SV', 'S8')] + [(name, SingleObservationV3.format) for name in header.obs_types[system]],
-                               # usecols=list(range(1, 1 + 3 * amount_of_obs_types, 3)),
-                               # names=header.obs_types[system]  # column names. i.e. obs types
+                               dtype=[('SV', 'S8')] + [(name, __single_observation_v3_format) for name in header.obs_types[system]]
                                )
+        if verbose:
+            print("For GNSS '{gnss:s}' only following obs types are included: {types:s}".format(
+                gnss=system,
+                types=str(list_of_obs_types)))
         result = result[list_of_obs_types]  # reduce result to only the selection of obs types
         for i in range(len(sv_names)):
             if sv_names[i] not in observations.satellites.keys():
-                observations.satellites[sv_names[i]] = {block_name: ""}
+                observations.satellites[sv_names[i]] = {block_name: np.nan}
             observations.satellites[sv_names[i]][block_name] = result[i]
-
-        # if system in observations.epochs.keys():
-        #     observations.epochs[system][block_name] = (sv_names, result)
-        # else:
-        #     observations.epochs[system] = {block_name: (sv_names, result)}
 
 
 def read_observation_blocks_v3(
@@ -120,15 +151,38 @@ def read_observation_blocks_v3(
         start_epoch: Optional[datetime],
         end_epoch: Optional[datetime],
         gnss: Optional[List[str]],
-        obs_types: Optional[str],
+        obs_types: Union[str, List[str], None],
         verbose: bool = False
 ) -> ObservationV3:
     """
+    Iterates through the Rinex file to read all observation records.
+    Skips all blocks that should not be included, based on epoch flag and time filter
 
-    :param verbose:
-    :param file:
-    :param header:
-    :return:
+    :param file: IO.
+        File iterator that reads file line by line.
+        Position of this iterator is expected to be on the 'END OF HEADER' line
+    :param header: ObservationHeaderV3.
+        observation.v3.header.ObservationHeaderV3 object that is filled with data from header
+    :param start_epoch: datetime.
+        Optional. Epoch time filter. Specifies start of the period that should be included in the result.
+        If used together with end_epoch, all blocks within the given timeframe will be read.
+        If used alone, the result will contain at most one block - the one that matches provided timestamp exactly.
+    :param end_epoch: datetime.
+        Optional. Epoch time filter. Specifies start of the period that should be included in the result.
+        When used, must be a date after the start_epoch date.
+    :param gnss: List[str].
+        Optional. GNSS filter. Specifies GNSS types (e.g. 'G' or 'E') that will be included into the result.
+        All other GNSS will be ignored.
+    :param obs_types: str or List[str].
+        Optional. Observation types filter.
+        If a single string is provided, it is treated as regex and used to filter obs types for all satellites.
+        If a list of strings is provided, then only that list is used to filter obs types.
+        If a GNSS does not have any obs types from that list, then that GNSS is not included in the result.
+    :param verbose: bool.
+        Optional. Flag to control debug output from the script.
+        Set to True if debug output should be printed to console.
+    :return: ObservationV3.
+        Holder class that contains observation record data. See observation.v3.observation.ObservationV3
     """
     result = ObservationV3()
     for line in file:

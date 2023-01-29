@@ -56,11 +56,17 @@ def read_observation_header_v3(
 ) -> ObservationHeaderV3:
     """
 
-    :param file:
-    :param version:
-    :param file_type:
-    :param gnss:
-    :return:
+    :param file: IO.
+        Required. File iterator that reads file line by line.
+        Position of this iterator is expected to be on the 'RINEX VERSION / TYPE' line.
+    :param version: float.
+        Required. Version of the provided RINEX document as obtained from the first header line.
+    :param file_type: str.
+        Required. RINEX file type (N or O) as obtained from the first header line.
+    :param gnss: str.
+        Required. GNSS of the RINEX file (Mixed or Single) as obtained from the first header line.
+    :return: ObservationHeaderV3.
+        Holder object for header data. See observation.v3.header.ObservationHeaderV3.
     """
     result = ObservationHeaderV3(version, file_type, gnss)
 

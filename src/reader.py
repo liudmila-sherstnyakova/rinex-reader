@@ -1,5 +1,5 @@
 import io
-from typing import Optional, List
+from typing import Optional, List, Union
 
 import common
 from common.rinex_data import RinexData
@@ -9,8 +9,21 @@ from observation.v3.observation import read_observation_blocks_v3
 
 def __read_first_line(line: str, verbose: bool = False) -> (float, str, str):
     """
-    Reads first line from RINEX file to determine version
-    :param line: first line from RINEX file
+    Reads first line from the RINEX file to determine the version, file type and GNSS type.
+
+    Expects line to be of format:
+
+    >>> 3.05           OBSERVATION DATA    M                   RINEX VERSION / TYPE
+
+    This method will raise an exception if the given line contains invalid data.
+
+    :param line: str.
+        Line that contains first line of RINEX format (see spec)
+    :param verbose: bool.
+        Flag to control debug output from the script.
+        Set to True if debug output should be printed to console.
+    :return: (float, str, str)
+        Tuple of (RINEX version as float, file type as str, GNSS as str)
     """
     if verbose:
         print("Reading first header line to determine RINEX version and file type...")
@@ -31,11 +44,11 @@ def __read_first_line(line: str, verbose: bool = False) -> (float, str, str):
 
 def read_rinex_file(
         rinex_file_path: str,
-        *,
+        *,  # all params after this point must be specified with name
         start_epoch: Optional[str] = None,
         end_epoch: Optional[str] = None,
         gnss: Optional[List[str]] = None,
-        obs_types: Optional[str] = None,
+        obs_types: Union[str, List[str], None] = None,
         verbose: bool = False
 ) -> RinexData:
     """
@@ -43,11 +56,74 @@ def read_rinex_file(
 
     Correct parser is chosen based on the version and the file type,
     that are extracted from the first line.
-    :param limit:
-    :param rinex_file_path: path to the RINEX file
-    :param verbose: boolean flag to control debug output from the script.
-                    Set to True if debug output should be printed to console.
-    :return: RinexData object, that contains header and data
+
+    Examples
+    --------
+    >>> import reader
+
+    Simple file reading with no filtering
+
+    >>> result = reader.read_rinex_file('path/to/rinex/file')
+    >>> result
+    Type: O (ver. 3.05). Contains 7 satellites
+
+    Filtering using GNSS list
+
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', gnss=['R','C'])
+    >>> result
+    Type: O (ver. 3.05). Contains 7 satellites
+
+    Filtering using obs types list
+
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', obs_types=['C1C','L2I'])
+    >>> result
+    Type: O (ver. 3.05). Contains 7 satellites
+
+    Filtering using obs types regex
+    Use '.' as wildcard for any part of the obs type acronym.
+    For example to select all obs types that have type C, use 'C..'
+    To select all obs types with type L and band 1, use 'L1.'
+
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', obs_types='C1.')
+    >>> result
+    Type: O (ver. 3.05). Contains 7 satellites
+
+    Filtering using time period
+
+    To include a single block
+
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file',
+    ... start_epoch="2022-09-29T11:00:00")
+
+    To include all blocks between dates
+
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file',
+    ... start_epoch="2022-09-29T11:00:00", end_epoch="2022-09-29T11:00:40")
+
+    :param rinex_file_path: str.
+        Required. Path to the RINEX file
+    :param start_epoch: str
+        Optional. Epoch time filter. Specifies start of the period that should be included in the result.
+        If specified, must be a datetime string in ISO8601 format, e.g. '2022-01-01T00:00:00'.
+        If used together with end_epoch, all blocks within the given timeframe will be read.
+        If used alone, the result will contain at most one block - the one that matches provided timestamp exactly.
+    :param end_epoch: str
+        Optional. Epoch time filter. Specifies start of the period that should be included in the result.
+        If specified, must be a datetime string in ISO8601 format, e.g. '2022-01-01T00:00:00'.
+        When used, must be a date after the start_epoch date.
+    :param gnss: list of str
+        Optional. GNSS filter. Specifies GNSS types (e.g. 'G' or 'E') that will be included into the result.
+        All other GNSS will be ignored.
+    :param obs_types: str, list of str
+        Optional. Observation types filter.
+        If a single string is provided, it is treated as regex and used to filter obs types for all satellites.
+        If a list of strings is provided, then only that list is used to filter obs types.
+        If a GNSS does not have any obs types from that list, then that GNSS is not included in the result.
+    :param verbose: bool.
+        Optional. Flag to control debug output from the script.
+        Set to True if debug output should be printed to console.
+    :return: RinexData.
+        Holder class that contains header and data. See common.rinex_data.RinexData
     """
     file = io.open(file=rinex_file_path, mode='r')
     version, file_type, system = __read_first_line(file.readline(), verbose)
