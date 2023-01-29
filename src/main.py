@@ -70,10 +70,10 @@ def read_with_period_time_filter():
 if __name__ == '__main__':
     start_time = time.time()  # program start time
     # read_without_filters()
-    read_with_gnss_filter()
+    # read_with_gnss_filter()
     # read_with_obs_types_regex_filter()
     # read_with_obs_types_list_filter()
-    # read_with_single_time_filter()
+    read_with_single_time_filter()
     # read_with_period_time_filter()
 
     print("--- Executed in %s seconds ---" % int((time.time() - start_time)))  # program total execution time

@@ -8,7 +8,7 @@ import re
 import common
 from observation.v3.header import ObservationHeaderV3
 
-__single_observation_v3_format = np.dtype([('value', np.float64), ('ssi', np.int32), ('lli', np.int32)])
+__single_observation_v3_format = np.dtype([('value', np.float64), ('lli', np.int32), ('ssi', np.int32)])
 
 
 class ObservationV3:
