@@ -3,6 +3,8 @@ from typing import Optional, List, Union
 
 import common
 from common.rinex_data import RinexData
+from navigation.v3.header import read_navigation_header_v3
+from navigation.v3.navigation import read_navigation_blocks_v3
 from observation.v3.header import *
 from observation.v3.observation import read_observation_blocks_v3
 
@@ -172,8 +174,9 @@ def read_rinex_file(
             observations = read_observation_blocks_v3(file, header, start_epoch, end_epoch, gnss, obs_types, verbose)
             result = RinexData(header, observations)
         else:
-            # TODO implement reading of navigation files
-            raise NotImplementedError("Navigation file type is not yet supported")
+            header = read_navigation_header_v3(file, version, file_type, system)
+            nav_data = read_navigation_blocks_v3(file, verbose)
+            result = RinexData(header, nav_data)
 
     elif version in (4.0,):
         # implement reading of RINEX 4

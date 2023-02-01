@@ -68,14 +68,22 @@ def read_with_period_time_filter():
     print("R04 - C1C: ", result.data.satellites["R04"]["2022-09-29T11:00:40"]["C1C"])
 
 
+def read_nav_file():
+    result = read_rinex_file(
+        rinex_file_path="../data/29_1100_K004_18t.22p"
+    )
+    print(len(result.data.satellites))
+
+
 if __name__ == '__main__':
     start_time = time.time()  # program start time
     # read_without_filters()
     # read_with_gnss_filter()
     # read_with_obs_types_regex_filter()
     # read_with_obs_types_list_filter()
-    read_with_single_time_filter()
+    # read_with_single_time_filter()
     # read_with_period_time_filter()
+    read_nav_file()
 
     print("--- Executed in %s seconds ---" % int((time.time() - start_time)))  # program total execution time
     print("--- Memory used: %f MB ---" % (psutil.Process().memory_info().rss / (1024 * 1024)))  # memory usage

@@ -8,6 +8,7 @@ APPROXIMATE_POSITION_LABEL = "APPROX POSITION XYZ"
 SYS_NO_OBS_TYPES_LABEL = "SYS / # / OBS TYPES"
 TIME_OF_FIRST_OBS_LABEL = "TIME OF FIRST OBS"
 END_OF_HEADER_LABEL = "END OF HEADER"
+PGM_RUNBY_DATE_LABEL = "PGM / RUN BY / DATE"
 
 
 def parse_number_with_exception(parse_function, arg, exception_msg: str):
