@@ -1,0 +1,8 @@
+     4.00           NAVIGATION DATA     MIXED               RINEX VERSION / TYPE
+TPS2RIN 1.0.28.3459 KB                  20230202 081422 UTC PGM / RUN BY / DATE
+Win64 build Jun 01, 2022 (c) Topcon Positioning Systems     COMMENT
+SRC: PPR1_290922.tps                                        COMMENT
+OPT: -s 29092022d110000 -f 30092022d045959 -I 10 -v 4.00    COMMENT
+OPT: -p PPR1_290922.ini                                     COMMENT
+    18    18  2185     7GPS                                 LEAP SECONDS
+                                                            END OF HEADER

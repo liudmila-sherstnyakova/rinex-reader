@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # read_with_obs_types_list_filter()
     # read_with_single_time_filter()
     # read_with_period_time_filter()
-    read_nav_file()
-
+    # read_nav_file()
+    result = read_rinex_file("../data/k004_18t_rinex400_1.22p")
     print("--- Executed in %s seconds ---" % int((time.time() - start_time)))  # program total execution time
     print("--- Memory used: %f MB ---" % (psutil.Process().memory_info().rss / (1024 * 1024)))  # memory usage

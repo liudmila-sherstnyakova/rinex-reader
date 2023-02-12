@@ -1,0 +1,28 @@
+     4.00           OBSERVATION DATA    MIXED               RINEX VERSION / TYPE
+TPS2RIN 1.0.28.3459 KB                  20230202 081422 UTC PGM / RUN BY / DATE
+Win64 build Jun 01, 2022 (c) Topcon Positioning Systems     COMMENT
+SRC: PPR1_290922.tps                                        COMMENT
+OPT: -s 29092022d110000 -f 30092022d045959 -I 10 -v 4.00    COMMENT
+OPT: -p PPR1_290922.ini                                     COMMENT
+GMGD320 2022        NMBU                                    OBSERVER / AGENCY
+01DWA4AJ08Y         TPS HIPER_VR        5.4+2105281211      REC # / TYPE / VERS
+SN: 1451-12132                                              COMMENT
+1451-12132          TPSHIPER_VR                             ANT # / TYPE
+        1.2886        0.0000        0.0000                  ANTENNA: DELTA H/E/N
+SSIR                                                        MARKER NAME
+  3172370.6788   603854.2750  5481905.3621                  APPROX POSITION XYZ
+  2022     9    29    11     0    0.0000000     GPS         TIME OF FIRST OBS
+  2022     9    30     4    59   50.0000000     GPS         TIME OF LAST OBS
+    10.000                                                  INTERVAL
+  6480 EPOCHS                                               COMMENT
+G    9 C1C L1C D1C C1W L1W D1W C2W L2W D2W                  SYS / # / OBS TYPES
+R    6 C1C L1C D1C C2C L2C D2C                              SYS / # / OBS TYPES
+E    6 C1X L1X D1X C5X L5X D5X                              SYS / # / OBS TYPES
+C    9 C2I L2I D2I C5P L5P D5P C7I L7I D7I                  SYS / # / OBS TYPES
+   106                                                      # OF SATELLITES
+   G01   183   183   183   146   146   146   146   146   146PRN / # OF OBS
+ 22 R01  1 R02 -4 R03  5 R04  6 R05  1 R06 -4 R07  5 R08  6 GLONASS SLOT / FRQ #
+    R09 -2 R10 -7 R11  0 R12 -1 R13 -2 R14 -7 R15  0 R17  4 GLONASS SLOT / FRQ #
+    R18 -3 R19  3 R20  2 R21  4 R23  3 R24  2               GLONASS SLOT / FRQ #
+    18    18  2185     7GPS                                 LEAP SECONDS
+                                                            END OF HEADER
