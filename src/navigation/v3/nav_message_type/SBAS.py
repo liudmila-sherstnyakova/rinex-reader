@@ -5,21 +5,20 @@ import io
 class SBASNavRecordOrbitData:
     def __init__(self):
         # b-orbit 1
-        self.sv_pos_X: float = 0.0
+        self.SV_pos_X: float = 0.0
         self.velocity_X: float = 0.0
         self.acceleration_X: float = 0.0
         self.health: float = 0.0
         # b-orbit 2
-        self.sv_pos_Y: float = 0.0
+        self.SV_pos_Y: float = 0.0
         self.velocity_Y: float = 0.0
         self.acceleration_Y: float = 0.0
         self.accuracy_code: float = 0.0
         # b-orbit 3
-        self.sv_pos_Z: float = 0.0
+        self.SV_pos_Z: float = 0.0
         self.velocity_Z: float = 0.0
         self.acceleration_Z: float = 0.0
-        self.iodn: float = 0.0
-
+        self.IODN: float = 0.0
 
 
 class SBASNavRecord:

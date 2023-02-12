@@ -12,6 +12,16 @@ __single_observation_v3_format = np.dtype([('value', np.float64), ('lli', np.int
 
 
 class ObservationV3:
+    """
+    Class that holds blocks of observation data grouped by satellite name.
+
+    Examples
+    --------
+
+    >>> obs.satellites['C01']['2022-01-01T01:00:00']['C2I']['value']
+    >>> obs.satellites['C01']['2022-01-01T01:00:00']['C2I']['ssi']
+    >>> obs.satellites['C01']['2022-01-01T01:00:00']['C2I']['lli']
+    """
     def __init__(self):
         # {
         #  sv: {
@@ -109,9 +119,9 @@ def __read_single_observation_block(
     for system, obs_lines in groupby(lines, lambda x: x[0]):
 
         if gnss is not None and system not in gnss:
-            # skip gnss that are not in the requested limitation
+            # skip nav_message_type that are not in the requested limitation
             if verbose:
-                print("[{block:s}] Skipped gnss {g:s} due to GNSS limitation".format(block=block_name, g=system))
+                print("[{block:s}] Skipped nav_message_type {g:s} due to GNSS limitation".format(block=block_name, g=system))
             continue
 
         lines_in_group = list(obs_lines)
@@ -126,7 +136,7 @@ def __read_single_observation_block(
             list_of_obs_types = header.obs_types[system]
         if len(list_of_obs_types) == 0:
             if verbose:
-                print("[{block:s}] Skipped gnss {g:s} due to OBS TYPES limitation".format(block=block_name, g=system))
+                print("[{block:s}] Skipped nav_message_type {g:s} due to OBS TYPES limitation".format(block=block_name, g=system))
             continue
         amount_of_obs_types = len(header.obs_types[system])
         complete_group = "".join(lines_in_group)

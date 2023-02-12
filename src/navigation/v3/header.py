@@ -5,6 +5,18 @@ from common import *
 
 
 class NavigationHeaderV3:
+    """
+    Class that holds the result of parsing header from Navigation file in version 3.
+    Contains following fields:
+
+    - agency: str
+    - created_by: str
+    - creation_time: datetime
+    - version: float
+    - file_type: str
+    - gnss: str
+    - other: {str: str}
+    """
     def __init__(self, version: float, file_type: str, gnss: str):
         self.agency: str = ""
         self.created_by: str = ""
@@ -21,6 +33,16 @@ def read_navigation_header_v3(
         file_type: str,
         gnss: str
 ) -> NavigationHeaderV3:
+    """
+    Parses input file line by line until 'END OF HEADER' line is read.
+    All header lines are extracted and parsed according to Rinex V3 specification for Navigation header
+
+    :param file: file iterator. Supposed to start at line number 2, as the first line is read by reader.__read_first_line
+    :param version: version of the file as read by reader.__read_first_line
+    :param file_type: type of the file as read by reader.__read_first_line
+    :param gnss: gnss of the file as read by reader.__read_first_line
+    :return: NavigationHeaderV3 object filled with necessary data
+    """
     result = NavigationHeaderV3(version, file_type, gnss)
 
     for line in file:

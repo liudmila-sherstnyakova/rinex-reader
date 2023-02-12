@@ -1,49 +1,50 @@
-import numpy as np
 import io
 
+import numpy as np
 
-class BDSNavRecordOrbitData:
+
+class QZSNavRecordOrbitData:
     def __init__(self):
         # b-orbit 1
-        self.aode: float = 0.0
-        self.crs: float = 0.0
-        self.delta_n: float = 0.0
-        self.m0: float = 0.0
+        self.IODE: float = 0.0
+        self.Crs: float = 0.0
+        self.Delta_n: float = 0.0
+        self.M0: float = 0.0
         # b-orbit 2
-        self.cuc: float = 0.0
+        self.Cuc: float = 0.0
         self.e: float = 0.0
-        self.cus: float = 0.0
-        self.sqrt_a: float = 0.0
+        self.Cus: float = 0.0
+        self.sqrt_A: float = 0.0
         # b-orbit 3
-        self.tte: float = 0.0
-        self.cic: float = 0.0
-        self.omega0: float = 0.0
-        self.cis: float = 0.0
+        self.Toe: float = 0.0
+        self.Cic: float = 0.0
+        self.OMEGA: float = 0.0
+        self.CIS: float = 0.0
         # b-orbit 4
         self.i0: float = 0.0
-        self.crc: float = 0.0
+        self.Crc: float = 0.0
         self.omega: float = 0.0
-        self.omega_dot: float = 0.0
+        self.OMEGA_DOT: float = 0.0
         # b-orbit 5
-        self.idot: float = 0.0
-        self.spare1: float = 0.0
-        self.bdt_week_no: float = 0.0
-        self.spare2: float = 0.0
+        self.IDOT: float = 0.0
+        self.L2_channel_codes: float = 0.0
+        self.GPS_Week_no: float = 0.0
+        self.L2P_flag: float = 0.0
         # b-orbit 6
-        self.sv_accuracy: float = 0.0
-        self.sat_h1: float = 0.0
-        self.tgd1: float = 0.0
-        self.tgd2: float = 0.0
+        self.SV_accuracy: float = 0.0
+        self.SV_health: float = 0.0
+        self.TGD: float = 0.0
+        self.IODC: float = 0.0
         # b-orbit 7
         self.transmission_time: float = 0.0
         self.fit_interval: float = 0.0
+        self.spare1: float = 0.0
+        self.spare2: float = 0.0
 
 
-class BDSNavRecord:
-    gnss_symbol = 'C'
-
+class QZSNavRecord:
+    gnss_symbol = 'J'
     block_size = 7  # amount of orbits
-
     epoch_line_format = np.dtype([
         ('SV', 'S8'),
         ('year', np.int32), ('month', np.int32), ('day', np.int32),
@@ -59,7 +60,7 @@ class BDSNavRecord:
         self.clock_bias: float = 0.0
         self.clock_drift: float = 0.0
         self.clock_drift_rate: float = 0.0
-        self.orbit_data = BDSNavRecordOrbitData()
+        self.orbit_data = QZSNavRecordOrbitData()
 
     def read_lines(self, lines: [str]):
         whole_block = "".join(lines)

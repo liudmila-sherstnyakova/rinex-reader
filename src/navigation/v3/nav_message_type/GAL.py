@@ -2,38 +2,38 @@ import numpy as np
 import io
 
 
-class GalileoNavRecordOrbitData:
+class GALNavRecordOrbitData:
     def __init__(self):
         # b-orbit 1
-        self.iod_nav: float = 0.0
-        self.crs: float = 0.0
-        self.delta_n: float = 0.0
-        self.m0: float = 0.0
+        self.IODnav: float = 0.0
+        self.Crs: float = 0.0
+        self.Delta_n: float = 0.0
+        self.M0: float = 0.0
         # b-orbit 2
-        self.cuc: float = 0.0
+        self.Cuc: float = 0.0
         self.e: float = 0.0
-        self.cus: float = 0.0
+        self.Cus: float = 0.0
         self.sqrt_a: float = 0.0
         # b-orbit 3
-        self.tte: float = 0.0
-        self.cic: float = 0.0
-        self.omega0: float = 0.0
-        self.cis: float = 0.0
+        self.Toe: float = 0.0
+        self.Cic: float = 0.0
+        self.OMEGA0: float = 0.0
+        self.Cis: float = 0.0
         # b-orbit 4
         self.i0: float = 0.0
-        self.crc: float = 0.0
+        self.Crc: float = 0.0
         self.omega: float = 0.0
-        self.omega_dot: float = 0.0
+        self.OMEGA_DOT: float = 0.0
         # b-orbit 5
-        self.idot: float = 0.0
-        self.data_sources: float = 0.0
-        self.gal_week_no: float = 0.0
+        self.IDOT: float = 0.0
+        self.Data_sources: float = 0.0
+        self.GAL_Week_no: float = 0.0
         self.spare1: float = 0.0
         # b-orbit 6
-        self.sisa: float = 0.0
-        self.sv_health: float = 0.0
-        self.bgd_e5a: float = 0.0
-        self.bgd_e5b: float = 0.0
+        self.SISA: float = 0.0
+        self.SV_health: float = 0.0
+        self.BGD_E5a_E1: float = 0.0
+        self.BGD_E5b_E1: float = 0.0
         # b-orbit 7
         self.transmission_time: float = 0.0
         self.spare2: float = 0.0
@@ -41,7 +41,7 @@ class GalileoNavRecordOrbitData:
         self.spare4: float = 0.0
 
 
-class GalileoNavRecord:
+class GALNavRecord:
     gnss_symbol = 'E'
 
     block_size = 7  # amount of orbits
@@ -61,7 +61,7 @@ class GalileoNavRecord:
         self.clock_bias: float = 0.0
         self.clock_drift: float = 0.0
         self.clock_drift_rate: float = 0.0
-        self.orbit_data = GalileoNavRecordOrbitData()
+        self.orbit_data = GALNavRecordOrbitData()
 
     def read_lines(self, lines: [str]):
         whole_block = "".join(lines)
