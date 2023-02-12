@@ -6,6 +6,16 @@ from common import *
 
 
 class Antenna:
+    """
+    Class that holds information about the receiver antenna.
+    Contains following fields:
+
+    - number: str
+    - type: str
+    - height: float
+    - east: float
+    - north: float
+    """
     def __init__(self):
         self.number: str = ""
         self.type: str = ""
@@ -22,6 +32,21 @@ class Antenna:
 
 
 class ObservationHeaderV3:
+    """
+    Class that holds the result of parsing header from Observation file in version 3.
+    Contains following fields:
+
+    - antenna: Antenna
+    - approximate_position: {'X': float, 'Y': float, 'Z': float}
+    - file_type: str
+    - version: float
+    - gnss: str
+    - marker_name: str
+    - obs_types: {str: [str]}
+    - system_time: str
+    - time_of_first_observation: numpy datetime
+    - other: {str: str}
+    """
     def __init__(self, version: float, file_type: str, gnss: str):
         self.antenna: Antenna = Antenna()
         self.approximate_position: Dict[str, float] = {}
@@ -55,6 +80,7 @@ def read_observation_header_v3(
         gnss: str
 ) -> ObservationHeaderV3:
     """
+    Reads the given file line by line until 'END OF HEADER' line is reached and reads header information.
 
     :param file: IO.
         Required. File iterator that reads file line by line.
