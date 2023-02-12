@@ -5,8 +5,12 @@ import common
 from common.rinex_data import RinexData
 from navigation.v3.header import read_navigation_header_v3
 from navigation.v3.navigation import read_navigation_blocks_v3
+from navigation.v4.header import read_navigation_header_v4
+from navigation.v4.navigation import read_navigation_blocks_v4
 from observation.v3.header import *
 from observation.v3.observation import read_observation_blocks_v3
+from observation.v4.header import *
+from observation.v4.observation import read_observation_blocks_v4
 
 
 def __read_first_line(line: str, verbose: bool = False) -> (float, str, str):
@@ -71,7 +75,7 @@ def read_rinex_file(
 
     Filtering using GNSS list
 
-    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', gnss=['R','C'])
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', nav_message_type=['R','C'])
     >>> result
     Type: O (ver. 3.05). Contains 7 satellites
 
@@ -179,8 +183,14 @@ def read_rinex_file(
             result = RinexData(header, nav_data)
 
     elif version in (4.0,):
-        # implement reading of RINEX 4
-        raise NotImplementedError("RINEX version 4.00 is not yet supported")
+        if file_type == "O":
+            header = read_observation_header_v4(file, version, file_type, system)
+            observations = read_observation_blocks_v4(file, header, start_epoch, end_epoch, gnss, obs_types, verbose)
+            result = RinexData(header, observations)
+        else:
+            header = read_navigation_header_v4(file, version, file_type, system)
+            nav_data = read_navigation_blocks_v4(file, verbose)
+            result = RinexData(header, nav_data)
 
     else:
         raise ValueError("Unknown RINEX version. Expected 3.04|3.05|4.00, but got {v:.2f}".format(v=version))

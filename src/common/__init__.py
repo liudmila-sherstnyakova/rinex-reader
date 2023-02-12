@@ -12,6 +12,15 @@ PGM_RUNBY_DATE_LABEL = "PGM / RUN BY / DATE"
 
 
 def parse_number_with_exception(parse_function, arg, exception_msg: str):
+    """
+    Executes provided parse-function inside a try-catch block.
+    If ValueError is raised, provided custom exception message is set on the exception.
+
+    :param parse_function: function that will be executed inside try-catch
+    :param arg: argument that will be used for parse_function
+    :param exception_msg: custom exception message
+    :return: result of the parse-function or ValueError
+    """
     try:
         return parse_function(arg)
     except ValueError as exc:
@@ -19,15 +28,36 @@ def parse_number_with_exception(parse_function, arg, exception_msg: str):
 
 
 def str2float(string: str, exception_msg: str):
+    """
+    Converts string to float. Raises ValueError with provided exception message when parsing fails.
+    """
     return parse_number_with_exception(float, string, exception_msg)
 
 
 def str2int(string: str, exception_msg: str):
+    """
+    Converts string to int. Raises ValueError with provided exception message when parsing fails.
+    """
     return parse_number_with_exception(int, string, exception_msg)
 
 
 def str2date(timestamp_str: str):
+    """
+    Converts string to datetime using ISO format: "%Y-%m-%dT%H:%M:%S".
+    """
     return datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+
+
+def normalize_data_string(string: str) -> str:
+    """
+    Formats incoming Rinex data string to have length of 80 chars and removes first 4 spaces.
+    """
+    result = string.strip("\n")
+    if len(result) < 80:
+        result = result.ljust(80)
+    if result.startswith("    "):
+        result = result[4:]
+    return result
 
 
 supported_gnss = ['M', 'G', 'R', 'E', 'J', 'C', 'I', 'S']
