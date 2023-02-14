@@ -3,7 +3,7 @@
 ## Introduction
 This document describes RinexReader software, that was developed as part of author's master thesis at NMBU.
 The application was written in Python, version 3.8. 
-The purpose of this library is provide future users necessary tools to parse Rinex file 
+The purpose of this library is to provide future users necessary tools to parse Rinex file 
 and be able to  develop their own applications using obtained data.
 
 ## Prerequisites
@@ -14,17 +14,17 @@ Following packages are required for the script to run:
 
 ## Package Structure
 
-* src/common
+* src/nmbu/rinex/common
     - Contains common utility methods and [RinexData] class that represents the complete data set read from file
-* src/navigation/v3
+* src/nmbu/rinex/navigation/v3
     - Contains classes and methods for reading Rinex ver 3 navigation files
-* src/navigation/v4
+* src/nmbu/rinex/navigation/v4
     - Contains classes and methods for reading Rinex ver 4 navigation files
-* src/observation/v3
+* src/nmbu/rinex/observation/v3
     - Contains classes and methods for reading Rinex ver 3 observation files
-* src/observation/v4
+* src/nmbu/rinex/observation/v4
     - Contains classes and methods for reading Rinex ver 4 observation files
-* src/[reader.py]
+* src/nmbu/rinex/[reader.py]
     - Contains method `read_rinex_file` that is the main method for reading Rinex files
     
 Additionally, code base contains file [main.py], which provides some examples of library usage.
@@ -306,6 +306,6 @@ block = result.find_closest_match(sv='R02', timestamp='2022-09-29T11:00:00')
 ```
 
 
-[RinexData]: src/common/rinex_data.py
-[reader.py]: src/reader.py
+[RinexData]: src/nmbu/rinex/common/rinex_data.py
+[reader.py]: src/nmbu/rinex/reader.py
 [main.py]: src/main.py

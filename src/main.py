@@ -2,7 +2,7 @@ import time
 
 import psutil  # memory measurement
 
-from reader import read_rinex_file
+from nmbu.rinex.reader import read_rinex_file
 
 
 def read_without_filters():
