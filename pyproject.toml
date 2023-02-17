@@ -1,0 +1,22 @@
+[project]
+name = "nmbu.rinex"
+version = "0.0.1"
+authors = [
+  { name="Liudmila Sherstnyakova" },
+]
+description = "Reader for RINEX v3 and v4 formats for both observation and navigation files"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/liudmila-sherstnyakova/rinex-reader"
+"Bug Tracker" = "https://github.com/liudmila-sherstnyakova/rinex-reader/issues"
+
+[build-system]
+requires = ["setuptools", "numpy"]
+build-backend = "setuptools.build_meta"
