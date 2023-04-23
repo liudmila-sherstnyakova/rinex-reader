@@ -29,8 +29,9 @@ def test_read_navigation_header_v3():
         assert result.obs_types['C'] == ['C2I', 'L2I', 'D2I', 'C5P', 'L5P', 'D5P', 'C7I', 'L7I', 'D7I']
         assert result.time_of_first_observation == numpy.datetime64('2022-09-29T11:00:00.000000000')
         assert result.system_time == 'GPS'
-        assert len(result.other) == 12
-        assert result.other.keys() == {'PGM / RUN BY / DATE', 'COMMENT', 'OBSERVER / AGENCY', 'REC # / TYPE / VERS', 'TIME OF LAST OBS', 'INTERVAL', '# OF SATELLITES', 'PRN / # OF OBS', 'SYS / PHASE SHIFT', 'GLONASS SLOT / FRQ #', 'GLONASS COD/PHS/BIS', 'LEAP SECONDS'}
+        assert result.interval == 10.0
+        assert len(result.other) == 11
+        assert result.other.keys() == {'PGM / RUN BY / DATE', 'COMMENT', 'OBSERVER / AGENCY', 'REC # / TYPE / VERS', 'TIME OF LAST OBS', '# OF SATELLITES', 'PRN / # OF OBS', 'SYS / PHASE SHIFT', 'GLONASS SLOT / FRQ #', 'GLONASS COD/PHS/BIS', 'LEAP SECONDS'}
 
 
 def test_read_navigation_header_v4():
@@ -56,7 +57,8 @@ def test_read_navigation_header_v4():
         assert result.obs_types['C'] == ['C2I', 'L2I', 'D2I', 'C5P', 'L5P', 'D5P', 'C7I', 'L7I', 'D7I']
         assert result.time_of_first_observation == numpy.datetime64('2022-09-29T11:00:00.000000000')
         assert result.system_time == 'GPS'
-        assert len(result.other) == 10
-        assert result.other.keys() == {'PGM / RUN BY / DATE', 'COMMENT', 'OBSERVER / AGENCY', 'REC # / TYPE / VERS', 'TIME OF LAST OBS', 'INTERVAL', '# OF SATELLITES', 'PRN / # OF OBS', 'GLONASS SLOT / FRQ #', 'LEAP SECONDS'}
+        assert result.interval == 10.0
+        assert len(result.other) == 9
+        assert result.other.keys() == {'PGM / RUN BY / DATE', 'COMMENT', 'OBSERVER / AGENCY', 'REC # / TYPE / VERS', 'TIME OF LAST OBS', '# OF SATELLITES', 'PRN / # OF OBS', 'GLONASS SLOT / FRQ #', 'LEAP SECONDS'}
 
 

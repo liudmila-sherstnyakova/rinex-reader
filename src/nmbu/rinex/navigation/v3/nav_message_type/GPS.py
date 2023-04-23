@@ -36,7 +36,7 @@ class GPSNavRecordOrbitData:
         self.TGD: float = 0.0
         self.IODC: float = 0.0
         # b-orbit 7
-        self.transmission_time: float = 0.0
+        self.t_tm: float = 0.0
         self.fit_interval: float = 0.0
         self.spare1: float = 0.0
         self.spare2: float = 0.0
@@ -52,6 +52,14 @@ class GPSNavRecord:
         ('clock_bias', np.float64), ('clock_drift', np.float64), ('clock_drift_rate', np.float64),
     ])
     delimiter = (4, 4) + (3,) * 5 + (19,) * 3
+
+    ion_corr_line_A_format = np.dtype([
+        ('alpha0', np.float64), ('alpha1', np.float64), ('alpha2', np.float64), ('alpha3', np.float64)
+    ])
+
+    ion_corr_line_B_format = np.dtype([
+        ('beta0', np.float64), ('beta1', np.float64), ('beta2', np.float64), ('beta3', np.float64)
+    ])
 
     def __init__(self, sv: str, timestamp: str):
         self.sv = sv

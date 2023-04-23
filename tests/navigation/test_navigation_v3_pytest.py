@@ -5,7 +5,7 @@ import pytest
 from nmbu.rinex.navigation.v3.header import read_navigation_header_v3
 from nmbu.rinex.navigation.v3.nav_message_type.BDS import BDSNavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.GAL import GALNavRecord
-from nmbu.rinex.navigation.v3.nav_message_type.GLO import GLONavRecord
+from nmbu.rinex.navigation.v3.nav_message_type.GLOv3_05 import GLONavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.GPS import GPSNavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.IRN import IRNNavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.QZS import QZSNavRecord
@@ -26,7 +26,7 @@ timestamp = datetime(2022, 9, 29, 9, 50, 0).isoformat()
      ]
 )
 def test_read_epoch_line(sv, expected_record_type):
-    record, valid, size = __read_epoch_line(sv + " 2022 09 29 09 50 00-1.393973361701E-04 3.623767952377E-12 0.000000000000E+00")
+    record, valid, size = __read_epoch_line(sv + " 2022 09 29 09 50 00-1.393973361701E-04 3.623767952377E-12 0.000000000000E+00",3.05)
     assert isinstance(record, expected_record_type)
     assert record.timestamp == timestamp
     assert record.block_size == expected_record_type.block_size
@@ -36,7 +36,7 @@ def test_read_epoch_line(sv, expected_record_type):
 
 
 def test_read_epoch_line__GLO():
-    record, valid, size = __read_epoch_line("R01 2022 09 29 09 50 00-1.393973361701E-04 3.623767952377E-12 0.000000000000E+00")
+    record, valid, size = __read_epoch_line("R01 2022 09 29 09 50 00-1.393973361701E-04 3.623767952377E-12 0.000000000000E+00", 3.05)
     assert isinstance(record, GLONavRecord)
     assert record.timestamp == timestamp
     assert record.block_size == GLONavRecord.block_size
@@ -46,7 +46,7 @@ def test_read_epoch_line__GLO():
 
 
 def test_read_epoch_line__SBAS():
-    record, valid, size = __read_epoch_line("S01 2022 09 29 09 50 00-1.393973361701E-04 3.623767952377E-12 0.000000000000E+00")
+    record, valid, size = __read_epoch_line("S01 2022 09 29 09 50 00-1.393973361701E-04 3.623767952377E-12 0.000000000000E+00", 3.05)
     assert isinstance(record, SBASNavRecord)
     assert record.timestamp == timestamp
     assert record.block_size == SBASNavRecord.block_size
@@ -55,16 +55,30 @@ def test_read_epoch_line__SBAS():
     assert record.msg_transmission_time == 0.000000000000E+00
 
 
-def test_read_navigation_blocks_v3__valid():
-    with (resources_path/"navigation_v3.22p").open() as f:
+def test_read_navigation_blocks_v304__valid():
+    with (resources_path/"navigation_v3.04.22p").open() as f:
         first_line = next(f)  # simulate reading first line
-        read_navigation_header_v3(file=f, version=3.05, file_type='N', gnss='M')
-        result = read_navigation_blocks_v3(file=f)
+        read_navigation_header_v3(file=f, version=3.04, file_type='N', gnss='M')
+        result = read_navigation_blocks_v3(file=f, version=3.04)
         assert result.satellites.keys() == {'C11', 'E05', 'G03', 'R19'}
         assert result.satellites["C11"].keys() == {'2022-09-29T10:00:00'}
         assert result.satellites["E05"].keys() == {'2022-09-29T09:50:00'}
         assert result.satellites["G03"].keys() == {'2022-09-29T12:00:00'}
         assert result.satellites["R19"].keys() == {'2022-09-29T10:45:00'}
+        assert result.satellites["E05"]['2022-09-29T09:50:00'].TGD == result.satellites["E05"]['2022-09-29T09:50:00'].BGD_E5b_E1
+
+
+def test_read_navigation_blocks_v305__valid():
+    with (resources_path/"navigation_v3.22p").open() as f:
+        first_line = next(f)  # simulate reading first line
+        read_navigation_header_v3(file=f, version=3.05, file_type='N', gnss='M')
+        result = read_navigation_blocks_v3(file=f, version=3.05)
+        assert result.satellites.keys() == {'C11', 'E05', 'G03', 'R19'}
+        assert result.satellites["C11"].keys() == {'2022-09-29T10:00:00'}
+        assert result.satellites["E05"].keys() == {'2022-09-29T09:50:00'}
+        assert result.satellites["G03"].keys() == {'2022-09-29T12:00:00'}
+        assert result.satellites["R19"].keys() == {'2022-09-29T10:45:00'}
+        assert result.satellites["E05"]['2022-09-29T09:50:00'].TGD == result.satellites["E05"]['2022-09-29T09:50:00'].BGD_E5b_E1
 
 
 def test_read_navigation_blocks_v3__invalid():
@@ -72,7 +86,7 @@ def test_read_navigation_blocks_v3__invalid():
         with (resources_path/"navigation_v3_invalid.22p").open() as f:
             next(f)  # simulate reading first line
             read_navigation_header_v3(file=f, version=3.05, file_type='N', gnss='M')
-            read_navigation_blocks_v3(file=f)
+            read_navigation_blocks_v3(file=f, version=3.05)
     assert str(e_info.value) == 'Block C112022-09-29T10:00:00 has invalid size.'
 
 

@@ -52,6 +52,7 @@ class RinexData:
     >>> ion_c06_Alpha4 = rinex.data.corrections['ION']['C06']['2020-01-01T11:00:00'].Alpha4
     >>> eop_j01_Yp = rinex.data.corrections['EOP']['J01']['2020-01-01T11:00:00'].Yp
     """
+
     def __init__(self,
                  header: Union[ObservationHeaderV3, NavigationHeaderV3, ObservationHeaderV4, NavigationHeaderV4],
                  data: Union[ObservationV3, ObservationV4, NavigationV3, NavigationV4]):
@@ -67,7 +68,7 @@ class RinexData:
 
     def find_closest_match(self, sv: str, timestamp: str):
         """
-        Finds closest navigation data block for the given satellite and timestamp.
+        Finds the closest navigation data block for the given satellite and timestamp.
 
         Examples
         --------
@@ -84,7 +85,7 @@ class RinexData:
         :param timestamp: timestamp in ISO format, e.g. '2020-01-01T00:00:00'
         :return: block of navigation data (if found) or None
         """
-        iso_format = '%Y-%m-%dT%H:%M:%S'
+        iso_format = '%Y-%m-%dT%H:%M:%S'  # '2020-01-01T00:00:00'
         if isinstance(self.data, NavigationV3) or isinstance(self.data, NavigationV4):
             if sv in self.data.satellites.keys():
                 block = self.data.satellites[sv]
@@ -92,6 +93,58 @@ class RinexData:
                 result = min(map(lambda x: datetime.strptime(x, iso_format), block.keys()),
                              key=lambda x: abs(x - timestamp))
                 return self.data.satellites[sv][result.isoformat()]
+            else:
+                return None
+        else:
+            return None
+
+    def find_closest_correction_match(self, correction_type: str, sv: str, timestamp: str):
+        """
+        Finds the closest corrections data block of the desired type
+        for the given satellite and timestamp
+
+        Examples
+        --------
+
+        >> rinex = reader.read_rinex_file('path/to/rinex/file')
+        >> result = rinex.find_closest_correction_match(correction_type='ION', sv='G01', timestamp='2020-01-01T00:00:00')
+
+        To query result, use dot-notation
+
+        >>> crs = result.Crs
+        >>> delta_n = result.Delta_n
+
+        :param correction_type: str. Correction type to search. Supported values are 'ION', 'EOP' or 'STO' as per RINEX specification
+        :param sv: str. name of the satellite, e.g. 'G01'
+        :param timestamp: timestamp in ISO format, e.g. '2020-01-01T00:00:00'
+        :return: block of navigation data (if found) or None
+        """
+        iso_format = '%Y-%m-%dT%H:%M:%S'  # '2020-01-01T00:00:00'
+        if isinstance(self.data, NavigationV3):
+            if sv in self.header.corrections[correction_type].keys():
+                block = self.header.corrections[correction_type][sv]
+                timestamp = datetime.strptime(timestamp, iso_format)
+                result = min(map(lambda x: datetime.strptime(x, iso_format), block.keys()),
+                             key=lambda x: abs(x - timestamp))
+                return self.header.corrections[correction_type][sv][result.isoformat()]
+            elif sv[0] in self.header.corrections[correction_type].keys():
+                block = self.header.corrections[correction_type][sv[0]]
+                if len(block) == 1 and "NO_TIME" in block.keys():
+                    return self.header.corrections[correction_type][sv[0]]["NO_TIME"]
+                else:
+                    timestamp = datetime.strptime(timestamp, iso_format)
+                    result = min(map(lambda x: datetime.strptime(x, iso_format), block.keys()),
+                                 key=lambda x: abs(x - timestamp))
+                    return self.header.corrections[correction_type][sv[0]][result.isoformat()]
+            else:
+                return None
+        elif isinstance(self.data, NavigationV4):
+            if sv in self.data.corrections[correction_type].keys():
+                block = self.data.corrections[correction_type][sv]
+                timestamp = datetime.strptime(timestamp, iso_format)
+                result = min(map(lambda x: datetime.strptime(x, iso_format), block.keys()),
+                             key=lambda x: abs(x - timestamp))
+                return self.data.corrections[correction_type][sv][result.isoformat()]
             else:
                 return None
         else:

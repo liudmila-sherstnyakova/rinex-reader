@@ -10,7 +10,8 @@ import numpy as np
 from nmbu.rinex.common import normalize_data_string
 from nmbu.rinex.navigation.v3.nav_message_type.BDS import BDSNavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.GAL import GALNavRecord
-from nmbu.rinex.navigation.v3.nav_message_type.GLO import GLONavRecord
+from nmbu.rinex.navigation.v3.nav_message_type.GLOv3_04 import GLONavRecord as GLO3_04NavRecord
+from nmbu.rinex.navigation.v3.nav_message_type.GLOv3_05 import GLONavRecord as GLO3_05NavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.GPS import GPSNavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.IRN import IRNNavRecord
 from nmbu.rinex.navigation.v3.nav_message_type.QZS import QZSNavRecord
@@ -42,7 +43,8 @@ class NavigationV3:
 
 
 def __read_epoch_line(
-        line: str
+        line: str,
+        version: float
 ) -> (object, bool, int):
     """
     Reads epoch line for the given block.
@@ -71,14 +73,31 @@ def __read_epoch_line(
         block.clock_drift = epoch["clock_drift"] * 1
         block.clock_drift_rate = epoch["clock_drift_rate"] * 1
         should_read_block = True
-    elif gnss == GLONavRecord.gnss_symbol:
+    elif version == 3.04 and gnss == GLO3_04NavRecord.gnss_symbol:
         epoch = np.genfromtxt(io.BytesIO(line.encode("ascii")),
-                              delimiter=GLONavRecord.delimiter,
-                              dtype=GLONavRecord.epoch_line_format,
+                              delimiter=GLO3_04NavRecord.delimiter,
+                              dtype=GLO3_04NavRecord.epoch_line_format,
                               autostrip=True
                               )
-        block_size = GLONavRecord.block_size
-        block = GLONavRecord(
+        block_size = GLO3_04NavRecord.block_size
+        block = GLO3_04NavRecord(
+            sv=str(np.char.decode(epoch["SV"])),
+            timestamp=datetime(
+                epoch["year"], epoch["month"], epoch["day"], epoch["hour"], epoch["min"], epoch["sec"]
+            ).isoformat()
+        )
+        block.clock_bias = epoch["clock_bias"] * 1
+        block.msg_frame_time = epoch["msg_frame_time"] * 1
+        block.relative_frequency_bias = epoch["relative_frequency_bias"] * 1
+        should_read_block = True
+    elif version == 3.05 and gnss == GLO3_05NavRecord.gnss_symbol:
+        epoch = np.genfromtxt(io.BytesIO(line.encode("ascii")),
+                              delimiter=GLO3_05NavRecord.delimiter,
+                              dtype=GLO3_05NavRecord.epoch_line_format,
+                              autostrip=True
+                              )
+        block_size = GLO3_05NavRecord.block_size
+        block = GLO3_05NavRecord(
             sv=str(np.char.decode(epoch["SV"])),
             timestamp=datetime(
                 epoch["year"], epoch["month"], epoch["day"], epoch["hour"], epoch["min"], epoch["sec"]
@@ -181,6 +200,7 @@ def __read_epoch_line(
 
 def read_navigation_blocks_v3(
         file: IO,
+        version: float,
         verbose: bool = False
 ) -> NavigationV3:
     """
@@ -189,13 +209,14 @@ def read_navigation_blocks_v3(
     ValueError is raised if any error occurs.
 
     :param file: file iterator. Supposed to start at 'END OF HEADER' line
+    :param version: RINEX version. Used to differentiate GLONASS V3.04 from GLONASS V3.05
     :param verbose: boolean flag to control debug output to console
     :return: NavigationV3 object containing read data
     """
     result = NavigationV3()
     for line in file:
         if line[0] != ' ':
-            current_block, valid_block, block_size = __read_epoch_line(line)
+            current_block, valid_block, block_size = __read_epoch_line(line, version)
             if verbose:
                 print("Working with block", current_block)
             block_lines = [normalize_data_string(next(file)) for _ in range(block_size)]
@@ -209,16 +230,20 @@ def read_navigation_blocks_v3(
                 else:
                     result.satellites[current_block.sv][current_block.timestamp] = current_block.orbit_data
 
+                result.satellites[current_block.sv][current_block.timestamp].timestamp = current_block.timestamp
+
                 if current_block.gnss_symbol in ('G', 'C', 'E'):
                     result.satellites[current_block.sv][current_block.timestamp].clock_bias = current_block.clock_bias
                     result.satellites[current_block.sv][current_block.timestamp].clock_drift = current_block.clock_drift
                     result.satellites[current_block.sv][current_block.timestamp].clock_drift_rate = current_block.clock_drift_rate
-                elif current_block.gnss_symbol in ('R',):
+                elif current_block.gnss_symbol in ('R', 'S'):
+                    result.satellites[current_block.sv][current_block.timestamp].clock_bias = current_block.clock_bias
                     result.satellites[current_block.sv][current_block.timestamp].relative_frequency_bias = current_block.relative_frequency_bias
                     result.satellites[current_block.sv][current_block.timestamp].msg_frame_time = current_block.msg_frame_time
-                elif current_block.gnss_symbol in ('S',):
-                    result.satellites[current_block.sv][current_block.timestamp].relative_frequency_bias = current_block.relative_frequency_bias
-                    result.satellites[current_block.sv][current_block.timestamp].msg_transmission_time = current_block.msg_transmission_time
+                # elif current_block.gnss_symbol in ('S',):
+                #     result.satellites[current_block.sv][current_block.timestamp].clock_bias = current_block.clock_bias
+                #     result.satellites[current_block.sv][current_block.timestamp].relative_frequency_bias = current_block.relative_frequency_bias
+                #     result.satellites[current_block.sv][current_block.timestamp].msg_transmission_time = current_block.msg_transmission_time
         else:
             raise ValueError("Navigation file seems to be invalid. Stopped reading at line\n", line)
         # end of for loop

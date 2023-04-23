@@ -8,22 +8,22 @@ class GALNavRecordOrbitData:
     def __init__(self):
         # b-orbit 1
         self.IODnav: float = 0.0
-        self.C_rs: float = 0.0
+        self.Crs: float = 0.0
         self.Delta_n: float = 0.0
         self.M0: float = 0.0
         # b-orbit 2
-        self.C_uc: float = 0.0
+        self.Cuc: float = 0.0
         self.e: float = 0.0
-        self.C_us: float = 0.0
-        self.sqrt_a: float = 0.0
+        self.Cus: float = 0.0
+        self.sqrt_A: float = 0.0
         # b-orbit 3
         self.Toe: float = 0.0
-        self.C_ic: float = 0.0
+        self.Cic: float = 0.0
         self.OMEGA0: float = 0.0
-        self.C_is: float = 0.0
+        self.Cis: float = 0.0
         # b-orbit 4
         self.i0: float = 0.0
-        self.C_rc: float = 0.0
+        self.Crc: float = 0.0
         self.omega: float = 0.0
         self.OMEGA_DOT: float = 0.0
         # b-orbit 5
@@ -36,7 +36,7 @@ class GALNavRecordOrbitData:
         self.BGD_E5a_E1: float = 0.0
         self.BGD_E5b_E1: float = 0.0
         # b-orbit 7
-        self.transmission_time: float = 0.0
+        self.t_tm: float = 0.0
 
 
 class GALINAVFNAVRecord:
@@ -83,3 +83,16 @@ class GALINAVFNAVRecord:
                                )
         for p in self.orbit_data.__dict__.keys():
             self.orbit_data.__dict__[p] = result[p] * 1  # convert to float
+
+        self.orbit_data.TGD = self.__get_correct_TGD_value__()
+
+    def __get_correct_TGD_value__(self):
+        ds_flag = int(self.orbit_data.Data_sources)
+        if   ds_flag & 0b00000001: # bit 0 set
+            return self.orbit_data.BGD_E5b_E1
+        elif ds_flag & 0b00000010: # bit 1 set:
+            return self.orbit_data.BGD_E5a_E1
+        elif ds_flag & 0b00000100: # bit 2 set:
+            return self.orbit_data.BGD_E5b_E1
+        else:
+            raise ValueError("Unable to determine TGD value based on Data_sources flag: {0}".format(self.orbit_data.Data_sources))

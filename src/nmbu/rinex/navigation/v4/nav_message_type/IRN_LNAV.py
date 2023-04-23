@@ -8,22 +8,22 @@ class IRNNavRecordOrbitData:
     def __init__(self):
         # b-orbit 1
         self.IODEC: float = 0.0
-        self.C_rs: float = 0.0
+        self.Crs: float = 0.0
         self.Delta_n: float = 0.0
         self.M0: float = 0.0
         # b-orbit 2
-        self.C_uc: float = 0.0
+        self.Cuc: float = 0.0
         self.e: float = 0.0
-        self.C_us: float = 0.0
+        self.Cus: float = 0.0
         self.sqrt_A: float = 0.0
         # b-orbit 3
         self.Toe: float = 0.0
-        self.C_ic: float = 0.0
+        self.Cic: float = 0.0
         self.OMEGA0: float = 0.0
-        self.C_is: float = 0.0
+        self.Cis: float = 0.0
         # b-orbit 4
         self.i0: float = 0.0
-        self.C_rc: float = 0.0
+        self.Crc: float = 0.0
         self.omega: float = 0.0
         self.OMEGA_DOT: float = 0.0
         # b-orbit 5
@@ -37,7 +37,7 @@ class IRNNavRecordOrbitData:
         self.TGD: float = 0.0
         self.spare3: float = 0.0
         # b-orbit 7
-        self.transmission_time: float = 0.0
+        self.t_tm: float = 0.0
 
 
 class IRNLNAVRecord:

@@ -36,6 +36,7 @@ class ObservationHeaderV4:
         self.system_time: str = ""
         self.time_of_first_observation: np.datetime64 = None
         self.version: float = version
+        self.interval: float = 0
 
     def __str__(self):
         return "RINEX FILE \n" \
@@ -45,6 +46,7 @@ class ObservationHeaderV4:
                "OBS TYPES: " + str(self.obs_types) + "\n" + \
                "SYSTEM TIME: " + self.system_time + "\n" + \
                "TIME OF FIRST OBSERVATION: " + str(self.time_of_first_observation) + "\n" + \
+               "INTERVAL: " + self.interval + "\n" + \
                "MARKER: " + self.marker_name + "\n" + \
                "ANTENNA: " + self.antenna.__str__() + "\n" + \
                "APPROXIMATE POSITION: " + str(self.approximate_position) + \
@@ -96,6 +98,9 @@ def read_observation_header_v4(
                                                          "Invalid Y coordinate in " + APPROXIMATE_POSITION_LABEL)
             result.approximate_position["Z"] = str2float(line[28:42],
                                                          "Invalid Z coordinate in " + APPROXIMATE_POSITION_LABEL)
+        elif line.__contains__(INTERVAL_LABEL):
+            result.interval = str2float(line[:60],
+                                        "Invalid interval value in" + INTERVAL_LABEL)
         elif line.__contains__(SYS_NO_OBS_TYPES_LABEL):
             gnss = line[0]
             assert gnss in supported_gnss or gnss == ' ', \

@@ -49,6 +49,7 @@ def test_read_navigation_blocks_v4__valid():
         assert result.satellites["G01"].keys() == {'2022-09-29T09:59:44'}
         assert result.satellites["C05"].keys() == {'2022-09-29T09:00:00'}
         assert result.satellites["E09"].keys() == {'2022-09-29T09:20:00'}
+        assert result.satellites["E09"]['2022-09-29T09:20:00'].TGD == result.satellites["E09"]['2022-09-29T09:20:00'].BGD_E5b_E1
 
         assert result.corrections.keys() == {'STO', 'ION', 'EOP'}
         assert result.corrections['STO'].keys() == {'G'}

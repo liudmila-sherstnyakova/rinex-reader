@@ -16,7 +16,7 @@ from nmbu.rinex.navigation.v4.nav_message_type.GLO_FDMA import GLOFDMARecord
 from nmbu.rinex.navigation.v4.nav_message_type.GPS_CNAV import GPSCNAVRecord
 from nmbu.rinex.navigation.v4.nav_message_type.GPS_CNAV2 import GPSCNAV2Record
 from nmbu.rinex.navigation.v4.nav_message_type.GPS_LNAV import GPSLNAVRecord
-from nmbu.rinex.navigation.v4.nav_message_type.ION_BDGIM import IONBDGIMNavRecord
+from nmbu.rinex.navigation.v4.nav_message_type.ION_Klobuchar import IONKlobNavRecord
 from nmbu.rinex.navigation.v4.nav_message_type.IRN_LNAV import IRNLNAVRecord
 from nmbu.rinex.navigation.v4.nav_message_type.QZS_CNAV import QZSCNAVRecord
 from nmbu.rinex.navigation.v4.nav_message_type.QZS_CNAV2 import QZSCNAV2Record
@@ -48,9 +48,9 @@ class NavigationV4:
 
     Supported corrections are:
 
-    - STO. See navigation.v4.nav_message_type.STO.STONavRecord
-    - EOP. See navigation.v4.nav_message_type.EOP.EOPNavRecord
-    - ION_BDGIM. See navigation.v4.nav_message_type.ION_BDGIM.IONBDGIMNavRecord
+    - STO. See nmbu.rinex.navigation.v4.nav_message_type.STO.STONavRecord
+    - EOP. See nmbu.rinex.navigation.v4.nav_message_type.EOP.EOPNavRecord
+    - ION_KLOBUCHAR. See nmbu.rinex.navigation.v4.nav_message_type.ION_Klobuchar.IONKlobNavRecord
 
 
     Examples
@@ -65,7 +65,7 @@ class NavigationV4:
         self.satellites: Dict[str, Dict[str, np.void]] = {}
         self.corrections: Dict[str, Dict[str, Dict[str, np.void]]] = {
             STONavRecord.nav_message_type: {},
-            IONBDGIMNavRecord.nav_message_type: {},
+            IONKlobNavRecord.nav_message_type: {},
             EOPNavRecord.nav_message_type: {},
         }
 
@@ -181,9 +181,9 @@ def __read_start_line(line: str) -> (object, bool, int):
         block_size = EOPNavRecord.block_size
     elif record_type == "ION":
         # FIXME decide how to differentiate between different types of ION corrections
-        current_block = IONBDGIMNavRecord(sv)
+        current_block = IONKlobNavRecord(sv)
         should_read_block = True
-        block_size = IONBDGIMNavRecord.block_size
+        block_size = IONKlobNavRecord.block_size
 
     else:
         raise ValueError("Unknown record type {r:s}".format(r=record_type))
@@ -221,6 +221,8 @@ def read_navigation_blocks_v4(
                     else:
                         result.satellites[current_block.sv][current_block.timestamp] = current_block.orbit_data
 
+                    result.satellites[current_block.sv][current_block.timestamp].timestamp = current_block.timestamp
+
                     if current_block.gnss_symbol in ('G', 'C', 'E', 'J', 'I'):
                         result.satellites[current_block.sv][
                             current_block.timestamp].clock_bias = current_block.clock_bias
@@ -247,6 +249,9 @@ def read_navigation_blocks_v4(
                         result.corrections[current_block.nav_message_type][
                             current_block.sv][current_block.timestamp] = current_block.message_line
 
+                    result.corrections[current_block.nav_message_type][
+                        current_block.sv][current_block.timestamp].timestamp = current_block.timestamp
+
                     if current_block.nav_message_type == 'STO':
                         result.corrections[current_block.nav_message_type][current_block.sv][
                             current_block.timestamp].time_offset = current_block.time_offset
@@ -256,11 +261,11 @@ def read_navigation_blocks_v4(
                             current_block.timestamp].utc_id = current_block.utc_id
                     elif current_block.nav_message_type == 'ION':
                         result.corrections[current_block.nav_message_type][current_block.sv][
+                            current_block.timestamp].Alpha0 = current_block.Alpha0
+                        result.corrections[current_block.nav_message_type][current_block.sv][
                             current_block.timestamp].Alpha1 = current_block.Alpha1
                         result.corrections[current_block.nav_message_type][current_block.sv][
                             current_block.timestamp].Alpha2 = current_block.Alpha2
-                        result.corrections[current_block.nav_message_type][current_block.sv][
-                            current_block.timestamp].Alpha3 = current_block.Alpha3
                     else:  # EOP
                         result.corrections[current_block.nav_message_type][current_block.sv][
                             current_block.timestamp].xp = current_block.xp

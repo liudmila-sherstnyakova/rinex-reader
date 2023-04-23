@@ -54,10 +54,10 @@ def __read_first_line(line: str, verbose: bool = False) -> (float, str, str):
 def read_rinex_file(
         rinex_file_path: str,
         *,  # all params after this point must be specified with name
-        start_epoch: Optional[str] = None,
-        end_epoch: Optional[str] = None,
-        gnss: Optional[List[str]] = None,
-        obs_types: Union[str, List[str], None] = None,
+        start_epoch: Optional[str] = None, # 2022-01-01T00:00:00
+        end_epoch: Optional[str] = None, # 2022-01-01T00:00:00
+        gnss: Optional[List[str]] = None, # ['G','E',...]
+        obs_types: Union[str, List[str], None] = None, # "L1L" / ".1X" / "C.." | ["C1X", "D2Y"]
         verbose: bool = False
 ) -> RinexData:
     """
@@ -78,7 +78,7 @@ def read_rinex_file(
 
     Filtering using GNSS list
 
-    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', nav_message_type=['R','C'])
+    >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', gnss=['R','C'])
     >>> result
     Type: O (ver. 3.05). Contains 7 satellites
 
@@ -90,8 +90,10 @@ def read_rinex_file(
 
     Filtering using obs types regex
     Use '.' as wildcard for any part of the obs type acronym.
+    Use '[]' as a list of accepted symbols.
     For example to select all obs types that have type C, use 'C..'
     To select all obs types with type L and band 1, use 'L1.'
+    To select all obs types with types L or C and band 2, use '[C, L]2.'
 
     >>> result = reader.read_rinex_file(rinex_file_path='path/to/rinex/file', obs_types='C1.')
     >>> result
@@ -133,6 +135,11 @@ def read_rinex_file(
 
     >>> list(map(lambda x: x["value"], result.data.satellites["R04"]["2022-09-29T11:00:00"])))
     [20279832.26, 108597600.752, 2741.776, 20279835.24, 84464829.352, 2132.492]
+
+    To filter only SVs for the given GNSS for the given timestamp, use list comprehension
+
+    >>> {sv: bl for sv, bl in result.data.satellites.items() if "2022-09-30T04:59:40" in bl.keys() and sv.startswith('E')}
+    {'C01':{'2022-09-30T04:59:40': ((27884261.6, -1, -1), (1.46532775e+08, -1, 5), ...}}
 
     :param rinex_file_path: str.
         Required. Path to the RINEX file
@@ -180,9 +187,9 @@ def read_rinex_file(
             header = read_observation_header_v3(file, version, file_type, system)
             observations = read_observation_blocks_v3(file, header, start_epoch, end_epoch, gnss, obs_types, verbose)
             result = RinexData(header, observations)
-        else:
+        elif file_type == "N":
             header = read_navigation_header_v3(file, version, file_type, system)
-            nav_data = read_navigation_blocks_v3(file, verbose)
+            nav_data = read_navigation_blocks_v3(file, version, verbose)
             result = RinexData(header, nav_data)
 
     elif version in (4.0,):
@@ -190,7 +197,7 @@ def read_rinex_file(
             header = read_observation_header_v4(file, version, file_type, system)
             observations = read_observation_blocks_v4(file, header, start_epoch, end_epoch, gnss, obs_types, verbose)
             result = RinexData(header, observations)
-        else:
+        elif file_type == "N":
             header = read_navigation_header_v4(file, version, file_type, system)
             nav_data = read_navigation_blocks_v4(file, verbose)
             result = RinexData(header, nav_data)

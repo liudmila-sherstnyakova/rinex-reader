@@ -36,7 +36,7 @@ class BDSNavRecordOrbitData:
         self.TGD1: float = 0.0
         self.TGD2: float = 0.0
         # b-orbit 7
-        self.transmission_time: float = 0.0
+        self.t_tm: float = 0.0
         self.AODC: float = 0.0
         self.spare3: float = 0.0
         self.spare4: float = 0.0
@@ -54,6 +54,14 @@ class BDSNavRecord:
         ('clock_bias', np.float64), ('clock_drift', np.float64), ('clock_drift_rate', np.float64),
     ])
     delimiter = (4, 4) + (3,) * 5 + (19,) * 3
+
+    ion_corr_line_A_format = np.dtype([
+        ('alpha0', np.float64), ('alpha1', np.float64), ('alpha2', np.float64), ('alpha3', np.float64)
+    ])
+
+    ion_corr_line_B_format = np.dtype([
+        ('beta0', np.float64), ('beta1', np.float64), ('beta2', np.float64), ('beta3', np.float64)
+    ])
 
     def __init__(self, sv: str, timestamp: str):
         self.sv = sv
@@ -73,3 +81,5 @@ class BDSNavRecord:
                                )
         for p in self.orbit_data.__dict__.keys():
             self.orbit_data.__dict__[p] = result[p] * 1  # convert to float
+
+        # TODO decide what to do with TGD and set self.orbit_data.TGD here. See e.g. GAL.py

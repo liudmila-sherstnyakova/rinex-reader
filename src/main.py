@@ -84,6 +84,11 @@ if __name__ == '__main__':
     # read_with_single_time_filter()
     # read_with_period_time_filter()
     # read_nav_file()
-    result = read_rinex_file("../data/k004_18t_rinex400_1.22p")
+    # result = read_rinex_file("../data/k004_18t_rinex400.22p")
+    result = read_rinex_file("../data/k004_18t_rinex400.22o")
+    r = {sv: bl for sv, bl in result.data.satellites.items() if "2022-09-30T04:59:40" in bl.keys() and sv.startswith('E')}
+    print(r['E31'])
+    # result = read_rinex_file("../data/29_1100_K004_18t.22p")
+    # result = read_rinex_file("../data/29_1100_K004_18t.22o")
     print("--- Executed in %s seconds ---" % int((time.time() - start_time)))  # program total execution time
     print("--- Memory used: %f MB ---" % (psutil.Process().memory_info().rss / (1024 * 1024)))  # memory usage

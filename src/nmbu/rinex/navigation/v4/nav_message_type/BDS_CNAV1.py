@@ -8,27 +8,27 @@ class BDSNavRecordOrbitData:
     def __init__(self):
         # b-orbit 1
         self.A_DOT: float = 0.0
-        self.C_rs: float = 0.0
-        self.Delta_n0: float = 0.0
+        self.Crs: float = 0.0
+        self.Delta_n: float = 0.0
         self.M0: float = 0.0
         # b-orbit 2
-        self.C_uc: float = 0.0
+        self.Cuc: float = 0.0
         self.e: float = 0.0
-        self.C_us: float = 0.0
+        self.Cus: float = 0.0
         self.sqrt_A: float = 0.0
         # b-orbit 3
         self.Toe: float = 0.0
         self.C_ic: float = 0.0
         self.OMEGA0: float = 0.0
-        self.C_is: float = 0.0
+        self.Cis: float = 0.0
         # b-orbit 4
         self.i0: float = 0.0
-        self.C_rc: float = 0.0
+        self.Crc: float = 0.0
         self.omega: float = 0.0
         self.OMEGA_DOT: float = 0.0
         # b-orbit 5
         self.IDOT: float = 0.0
-        self.Delta_n0_dot: float = 0.0
+        self.Delta_n_dot: float = 0.0
         self.SatType: float = 0.0
         self.t_op: float = 0.0
         # b-orbit 6
@@ -73,6 +73,7 @@ class BDSCNAV1Record:
         self.clock_bias: float = 0.0
         self.clock_drift: float = 0.0
         self.clock_drift_rate: float = 0.0
+        self.TGD: float = 0.0
         self.orbit_data = BDSNavRecordOrbitData()
 
     def read_epoch_line(self, line: str):
@@ -97,3 +98,5 @@ class BDSCNAV1Record:
                                )
         for p in self.orbit_data.__dict__.keys():
             self.orbit_data.__dict__[p] = result[p] * 1  # convert to float
+
+        # TODO decide what to do with TGD and set self.orbit_data.TGD here. See e.g. GAL_INAV_FNAV.py
