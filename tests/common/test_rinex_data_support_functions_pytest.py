@@ -2,6 +2,7 @@ from nmbu.rinex import reader
 from nmbu.rinex.navigation.v3.nav_message_type.GAL import GALNavRecordOrbitData as GALNavRecordOrbitDataV3
 from nmbu.rinex.navigation.v4.nav_message_type.GAL_INAV_FNAV import GALNavRecordOrbitData as GALNavRecordOrbitDataV4
 from nmbu.rinex.navigation.v4.nav_message_type.ION_Klobuchar import IONKlobNavRecordData
+from nmbu.rinex.navigation.v4.nav_message_type.STO import STONavRecordData
 from tests import resources_path
 
 
@@ -41,3 +42,10 @@ def test_find_closest_correction_match():
     assert c06_ion.timestamp == "2022-09-29T09:40:42"
     e06 = rinex_nav_v4.find_closest_correction_match(correction_type='ION', sv="E06", timestamp="2022-09-29T10:00:00")
     assert e06 is None # No ION block for E06
+    g_sto = rinex_nav_v4.find_closest_correction_match(correction_type='STO', sv='G04', timestamp="2022-09-29T10:00:00")
+    assert isinstance(g_sto, STONavRecordData)
+    assert g_sto.t_tm == -1.088640000000e+08
+    assert g_sto.A0 == 2.793967723846e-09
+    assert g_sto.A1 == 1.243449787580e-14
+    assert g_sto.A2 == 0.000000000000e+00
+    assert g_sto.timestamp == "2022-09-24T19:50:24"

@@ -57,14 +57,14 @@ result = read_rinex_file(rinex_file_path='path/to/file.22o')
 
 Read function takes following input parameters:
 
-|  Parameter name  |     |     |     |     | Required  |     |     |     | Type                      |     | Description                                                                                                                                                                                                                                                                                                                                                                     |
-|:----------------:|-----|-----|-----|-----|:---------:|-----|-----|-----|:--------------------------|-----|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| rinex_file_path  |     |     |     |     |    Yes    |     |     |     | String                    |     | Path to the Rinex file as string                                                                                                                                                                                                                                                                                                                                                |
-|   start_epoch    |     |     |     |     |    No     |     |     |     | String or datetime        |     | Epoch time filter. Specifies start of the period that should be included in the result. <br />If specified, must be a datetime string in ISO8601 format, e.g. '2022-01-01T00:00:00'. <br />If used together with end_epoch, all blocks within the given timeframe will be read. <br />If used alone, the result will contain at most one block - the one that matches provided  |
-|    end_epoch     |     |     |     |     |    No     |     |     |     | String or datetime        |     | Epoch time filter. Specifies end of the period that should be included in the result.  <br />If specified, must be a datetime string in ISO8601 format, e.g. '2022-01-01T00:00:00'.  <br />When used, must be a date after the start_epoch date.                                                                                                                                |
-|       gnss       |     |     |     |     |    No     |     |     |     | List of strings           |     | GNSS filter. Specifies GNSS types (e.g. 'G' or 'E') that will be included into the result. All other GNSS will be ignored.                                                                                                                                                                                                                                                      |
-|    obs_types     |     |     |     |     |    No     |     |     |     | String or list of strings |     | Observation types filter.  If a single string is provided, it is treated as regex and used to filter obs types for all satellites.  <br />If a list of strings is provided, then only that list is used to filter obs types.  <br />If a GNSS does not have any obs types from that list, then that GNSS is not included in the result.                                         |
-|     verbose      |     |     |     |     |    No     |     |     |     | Boolean                   |     | Flag to control debug output from the script. Set to True if debug output should be printed to console.                                                                                                                                                                                                                                                                         |
+|  Parameter name  | Required  | Type                      | Description                                                                                                                                                                                                                                                                                                                                                                     |
+|:----------------:|:---------:|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| rinex_file_path  |    Yes    | String                    | Path to the Rinex file as string                                                                                                                                                                                                                                                                                                                                                |
+|   start_epoch    |    No     | String or datetime        | Epoch time filter. Specifies start of the period that should be included in the result. <br />If specified, must be a datetime string in ISO8601 format, e.g. '2022-01-01T00:00:00'. <br />If used together with end_epoch, all blocks within the given timeframe will be read. <br />If used alone, the result will contain at most one block - the one that matches provided  |
+|    end_epoch     |    No     | String or datetime        | Epoch time filter. Specifies end of the period that should be included in the result.  <br />If specified, must be a datetime string in ISO8601 format, e.g. '2022-01-01T00:00:00'.  <br />When used, must be a date after the start_epoch date.                                                                                                                                |
+|       gnss       |    No     | List of strings           | GNSS filter. Specifies GNSS types (e.g. 'G' or 'E') that will be included into the result. All other GNSS will be ignored.                                                                                                                                                                                                                                                      |
+|    obs_types     |    No     | String or list of strings | Observation types filter.  If a single string is provided, it is treated as regex and used to filter obs types for all satellites.  <br />If a list of strings is provided, then only that list is used to filter obs types.  <br />If a GNSS does not have any obs types from that list, then that GNSS is not included in the result.                                         |
+|     verbose      |    No     | Boolean                   | Flag to control debug output from the script. Set to True if debug output should be printed to console.                                                                                                                                                                                                                                                                         |
 
 
 **Important note about filters:**
@@ -170,9 +170,9 @@ result.header:
             },
             "C12": {
                 "NO_TIME": {
-                    "alpha0": 123.123,
+                    "Alpha0": 123.123,
                     ...
-                    "beta3": 123.123
+                    "Beta3": 123.123
                 }
             },
             ...
@@ -193,7 +193,7 @@ RINEX V4 specifies corrections in the records, thus V4 Navigation header will no
 To access various fields, one can use following syntax:
 
 ```
-c11_ion_alpha0 = result.header.corrections['ION']['C11']['M'].alpha0
+c11_ion_Alpha0 = result.header.corrections['ION']['C11']['M'].Alpha0
 e_ion_ai0 = result.header.corrections['ION']['E']['NO_TIME'].ai0
 time = result.header.created_time
 ```

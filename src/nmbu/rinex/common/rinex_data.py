@@ -145,6 +145,12 @@ class RinexData:
                 result = min(map(lambda x: datetime.strptime(x, iso_format), block.keys()),
                              key=lambda x: abs(x - timestamp))
                 return self.data.corrections[correction_type][sv][result.isoformat()]
+            elif sv[0] in self.data.corrections[correction_type].keys():
+                block = self.data.corrections[correction_type][sv[0]]
+                timestamp = datetime.strptime(timestamp, iso_format)
+                result = min(map(lambda x: datetime.strptime(x, iso_format), block.keys()),
+                             key=lambda x: abs(x - timestamp))
+                return self.data.corrections[correction_type][sv[0]][result.isoformat()]
             else:
                 return None
         else:

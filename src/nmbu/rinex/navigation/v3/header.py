@@ -108,10 +108,10 @@ def read_navigation_header_v3(
                 if time_mark not in result.corrections['ION'][sv_name].keys():
                     result.corrections['ION'][sv_name][time_mark] = IONCorrections()
 
-                result.corrections['ION'][sv_name][time_mark].alpha0 = values['alpha0']
-                result.corrections['ION'][sv_name][time_mark].alpha1 = values['alpha1']
-                result.corrections['ION'][sv_name][time_mark].alpha2 = values['alpha2']
-                result.corrections['ION'][sv_name][time_mark].alpha3 = values['alpha3']
+                result.corrections['ION'][sv_name][time_mark].Alpha0 = values['alpha0']
+                result.corrections['ION'][sv_name][time_mark].Alpha1 = values['alpha1']
+                result.corrections['ION'][sv_name][time_mark].Alpha2 = values['alpha2']
+                result.corrections['ION'][sv_name][time_mark].Alpha3 = values['alpha3']
 
             elif gnss in ('BDS', 'GPS', 'QZS', 'IRN') and corr_type == 'B':
                 if gnss == 'BDS':
@@ -134,10 +134,10 @@ def read_navigation_header_v3(
                 if time_mark not in result.corrections['ION'][sv_name].keys():
                     result.corrections['ION'][sv_name][time_mark] = IONCorrections()
 
-                result.corrections['ION'][sv_name][time_mark].beta0 = values['beta0']
-                result.corrections['ION'][sv_name][time_mark].beta1 = values['beta1']
-                result.corrections['ION'][sv_name][time_mark].beta2 = values['beta2']
-                result.corrections['ION'][sv_name][time_mark].beta3 = values['beta3']
+                result.corrections['ION'][sv_name][time_mark].Beta0 = values['beta0']
+                result.corrections['ION'][sv_name][time_mark].Beta1 = values['beta1']
+                result.corrections['ION'][sv_name][time_mark].Beta2 = values['beta2']
+                result.corrections['ION'][sv_name][time_mark].Beta3 = values['beta3']
             else:
                 print("Unknown gnss for {l:s}: {gnss:s}{corr_type:s}".format(
                     l=IONOSPHERIC_CORR_LABEL,
