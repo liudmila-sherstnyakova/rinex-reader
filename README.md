@@ -33,7 +33,9 @@ Following packages need to be available for the runtime:
 * src/nmbu/rinex/[reader.py]
     - Contains method `read_rinex_file` that is the main method for reading Rinex files
     
-Additionally, code base contains file [main.py], which provides some examples of library usage.
+Additionally, code base contains file [examples.py], which provides some examples of library usage.
+
+Packaging is done using official pypi package guide: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 ## Usage
 
@@ -398,18 +400,23 @@ all_values = list(map(
 # all_values = [20279832.26, 108597600.752, 2741.776, 20279835.24, ...]
 ```
 
-When handling navigation data, [RinexData] class provides utility method to search for the closest time block
-for a given satellite
+When handling navigation data, [RinexData] class provides additional utility methods:
+* `find_closest_match` - to search for the closest time block for a given satellite
+* `find_closest_correction_match` - to search for the closest correction block for a given satellite
 
 ```
 block = result.find_closest_match(sv='R02', timestamp='2022-09-29T11:00:00')
 # block will contain fields based on the GNSS. In this example, one can use
 # block.SV_pos_X or block.msg_frame_time, since GLONASS satellite was used.
+
+block = result.find_closest_correction_match(correction_type='ION', sv='G01', timestamp='2020-01-01T00:00:00')
+# block will contain fields based on the GNSS. In this example, one can use ION Klobuchar variables
+# block.Alpha0 or block.Beta0, since ION corrections for GPS were requested.
 ```
 
 
 [RinexData]: src/nmbu/rinex/common/rinex_data.py
 [reader.py]: src/nmbu/rinex/reader.py
-[main.py]: src/main.py
+[examples.py]: src/examples.py
 [numpy]: https://numpy.org/
 [pytest]: https://pytest.org/
