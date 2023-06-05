@@ -1,6 +1,6 @@
 [project]
 name = "nmbu.rinex"
-version = "0.0.1"
+version = "1.0.0"
 authors = [
   { name="Liudmila Sherstnyakova" },
 ]
