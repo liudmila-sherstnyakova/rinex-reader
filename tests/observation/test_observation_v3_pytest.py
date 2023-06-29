@@ -75,3 +75,11 @@ def test_read_obs_v3__time_filter():
     assert len(result.data.satellites) == 25
     for sv in result.data.satellites.values():
         assert sv.keys() == {'2022-09-29T11:00:00', '2022-09-29T11:00:10', '2022-09-29T11:00:20'}
+
+def test_read_obs_v3__single_sv():
+    result = reader.read_rinex_file(
+        rinex_file_path=resources_path / "observation_v3_single_sv.22o"
+    )
+    assert len(result.data.satellites) == 1
+    assert result.data.satellites["C12"]["2022-09-29T11:00:00"]["C2I"]["value"] == 23486627.58
+    assert result.data.satellites["C12"]["2022-09-29T11:00:00"]["D7I"]["value"] == -1501.578

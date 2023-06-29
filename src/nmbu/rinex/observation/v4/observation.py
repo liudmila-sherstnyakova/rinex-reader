@@ -156,7 +156,10 @@ def __read_single_observation_block(
         for i in range(len(sv_names)):
             if sv_names[i] not in observations.satellites.keys():
                 observations.satellites[sv_names[i]] = {block_name: np.nan}
-            observations.satellites[sv_names[i]][block_name] = result[i]
+            if result.ndim == 0:
+                observations.satellites[sv_names[i]][block_name] = result
+            else:
+                observations.satellites[sv_names[i]][block_name] = result[i]
 
 
 def read_observation_blocks_v4(
